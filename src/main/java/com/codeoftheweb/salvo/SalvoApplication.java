@@ -16,7 +16,7 @@ public class SalvoApplication {
 	}
 
 	@Bean
-	public CommandLineRunner initData(GameRepository gameRepo, PlayerRepository playerRepo, GamePlayerRepository gpRepo, ShipRepository shipRepo, SalvoRepository salvoRepo){
+	public CommandLineRunner initData(GameRepository gameRepo, PlayerRepository playerRepo, GamePlayerRepository gpRepo, ShipRepository shipRepo, SalvoRepository salvoRepo, ScoreRepository scoreRepo){
 		return (args) ->{
 			Date today = new Date();
 
@@ -51,6 +51,18 @@ public class SalvoApplication {
 			Salvo salvo8 = new Salvo(Arrays.asList("A2", "G6", "H6"),1);
 			Salvo salvo9 = new Salvo(Arrays.asList("A1", "A2", "A3"),1);
 			Salvo salvo10 = new Salvo(Arrays.asList("G6", "G7","G8"), 2);
+
+			Score score1 = new Score(1.0, game1, jbauer);
+			Score score2 = new Score(0.0, game1, cobrian);
+			Score score3 = new Score(1.0, game2, jbauer);
+			Score score4 = new Score(0.0, game2, cobrian);
+			Score score5 = new Score(0.5, game3, cobrian);
+			Score score6 = new Score(0.5, game3, talmeida);
+			Score score7 = new Score(0.0, game4, jbauer);
+			Score score8 = new Score(1.0, game4, cobrian);
+			Score score9 = new Score(0.0, game5, talmeida);
+			Score score10 = new Score(1.0, game5, jbauer);
+			Score score11 = new Score();
 
 			GamePlayer gp1 = new GamePlayer();
 			gp1.setGame(game1);
@@ -157,6 +169,18 @@ public class SalvoApplication {
 			salvoRepo.save(salvo8);
 			salvoRepo.save(salvo9);
 			salvoRepo.save(salvo10);
+
+			scoreRepo.save(score1);
+			scoreRepo.save(score2);
+			scoreRepo.save(score3);
+			scoreRepo.save(score4);
+			scoreRepo.save(score5);
+			scoreRepo.save(score6);
+			scoreRepo.save(score7);
+			scoreRepo.save(score8);
+			scoreRepo.save(score9);
+			scoreRepo.save(score10);
+			scoreRepo.save(score11);
 		};
 	}
 }

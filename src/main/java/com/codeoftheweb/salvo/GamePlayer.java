@@ -5,6 +5,7 @@ import org.hibernate.annotations.GenericGenerator;
 import javax.persistence.*;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
 
 @Entity
@@ -84,5 +85,9 @@ public class GamePlayer {
 
     public long getId() {
         return gamePlayerId;
+    }
+
+    public Optional<Score> getScore(){
+        return player.getScore(game);
     }
 }

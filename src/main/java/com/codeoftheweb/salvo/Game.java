@@ -20,6 +20,9 @@ public class Game {
     @OneToMany(mappedBy = "game", fetch = FetchType.EAGER)
     Set<GamePlayer> gamePlayers = new HashSet<>();
 
+    @OneToMany(mappedBy = "game", fetch = FetchType.EAGER)
+    Set<Score> scores = new HashSet<>();
+
     public Game(){
 
     }
@@ -32,15 +35,6 @@ public class Game {
         return gameDate;
     }
 
-    public void setGameDate(Date gameDate) {
-        this.gameDate = gameDate;
-    }
-
-    public void addGamePlayer(GamePlayer gamePlayer){
-        gamePlayer.setGame(this);
-        gamePlayers.add(gamePlayer);
-    }
-
     public List<Player> getPlayers(){
         return gamePlayers.stream().map(GamePlayer::getPlayer).collect(Collectors.toList());
     }
@@ -51,5 +45,23 @@ public class Game {
 
     public Set<GamePlayer> getGamePlayers() {
         return gamePlayers;
+    }
+
+    public Set<Score> getScores() {
+        return scores;
+    }
+
+    public void setGameDate(Date gameDate) {
+        this.gameDate = gameDate;
+    }
+
+    public void addGamePlayer(GamePlayer gamePlayer){
+        gamePlayer.setGame(this);
+        gamePlayers.add(gamePlayer);
+    }
+
+    public void addScore(Score score){
+        //score.setGame(this);
+        scores.add(score);
     }
 }
