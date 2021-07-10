@@ -1,6 +1,7 @@
 package com.codeoftheweb.salvo;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -11,6 +12,9 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/api")
 public class SalvoController {
+
+//    @Autowired
+//    private PasswordEncoder passwordEncoder;
 
     @Autowired
     private GameRepository gameRepository;
@@ -29,15 +33,6 @@ public class SalvoController {
         dto.put("games", auxList);
         return dto;
     }
-//    public List<Object> getAllGames(){
-//        List<Object> auxList = new ArrayList<>();
-//        List<Game> games = gameRepository.findAll();
-//
-//        for(Game game: games){
-//            auxList.add(getDTO(game));
-//        }
-//        return auxList;
-//    }
 
     @RequestMapping("/game_view/{gamePlayerId}")
     public Map<String, Object> getGameView(@PathVariable Long gamePlayerId){
@@ -68,7 +63,7 @@ public class SalvoController {
 
     private Map<String, Object> getPlayerDTO(Player player){
         Map<String, Object> dto = new LinkedHashMap<>();
-        dto.put("id", player.getUserId());
+        dto.put("id", player.getId());
         dto.put("email", player.getUserName());
         return dto;
     }
@@ -83,7 +78,7 @@ public class SalvoController {
     private Map<String, Object> getSalvoDTO(Salvo salvo){
         Map<String, Object> dto = new LinkedHashMap<>();
         dto.put("turn", salvo.getTurn());
-        dto.put("player", salvo.getGamePlayer().getPlayer().getUserId());
+        dto.put("player", salvo.getGamePlayer().getPlayer().getId());
         dto.put("locations", salvo.getLocations());
         return dto;
     }
@@ -94,7 +89,7 @@ public class SalvoController {
         if(score.isEmpty()){
             dto.put("score", "Este juego no tiene puntaje");
         } else{
-            dto.put("player", score.get().getPlayer().getUserId());
+            dto.put("player", score.get().getPlayer().getId());
             dto.put("score", score.get().getScore());
             dto.put("finishDate", score.get().getFinishDate());
         }
