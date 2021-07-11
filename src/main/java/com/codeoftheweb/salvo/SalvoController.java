@@ -1,10 +1,12 @@
 package com.codeoftheweb.salvo;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -13,8 +15,11 @@ import java.util.stream.Collectors;
 @RequestMapping("/api")
 public class SalvoController {
 
-//    @Autowired
-//    private PasswordEncoder passwordEncoder;
+    @Autowired
+    PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private PlayerRepository playerRepository;
 
     @Autowired
     private GameRepository gameRepository;
@@ -23,12 +28,17 @@ public class SalvoController {
     private GamePlayerRepository gpRepository;
 
     @RequestMapping("/games")
-    public Map<String, Object> getAllGames(){
+    public Map<String, Object> getAllGames(Authentication authentication){
         Map<String, Object> dto = new LinkedHashMap<>();
         List<Object> auxList = new ArrayList<>();
         List<Game> games = gameRepository.findAll();
         for(Game game: games){
             auxList.add(getDTO(game));
+        }
+        if(authentication != null){
+            dto.put("player", getPlayerDTO(authenticateUser(authentication)));
+        } else {
+            dto.put("player", "Guest");
         }
         dto.put("games", auxList);
         return dto;
@@ -43,6 +53,23 @@ public class SalvoController {
         dto.put("ships", gamePlayer.getShips().stream().map(ship -> getShipDTO(ship)));
         dto.put("salvoes", game.getGamePlayers().stream().flatMap(gp -> gp.getSalvoes().stream().map(salvo -> getSalvoDTO(salvo))));
         return dto;
+    }
+
+    @RequestMapping(path = "/players", method = RequestMethod.POST)
+    public ResponseEntity<Map<String, Object>> createPlayer(@RequestParam String username, @RequestParam String password){
+        if(username.isEmpty()){
+            return new ResponseEntity<>(getDefaultDTO("error", "Debe ingresar un email"), HttpStatus.FORBIDDEN);
+        }
+
+        Player player = playerRepository.findByUserName(username);
+        if(player != null){
+            return new ResponseEntity<>(getDefaultDTO("error", "Este mail ya esta en uso"), HttpStatus.CONFLICT);
+        }
+
+        Player newPlayer = new Player(username, passwordEncoder.encode(password));
+        playerRepository.save(newPlayer);
+
+        return new ResponseEntity<>(getDefaultDTO("username", newPlayer.getUserName()), HttpStatus.CREATED);
     }
 
     private Map<String, Object> getDTO(Game game){
@@ -94,5 +121,19 @@ public class SalvoController {
             dto.put("finishDate", score.get().getFinishDate());
         }
         return dto;
+    }
+
+    private Map<String, Object> getDefaultDTO(String key, Object value){
+        Map<String, Object> dto = new LinkedHashMap<>();
+        dto.put(key, value);
+        return dto;
+    }
+
+    private Player authenticateUser(Authentication authentication){
+        if (authentication == null || authentication instanceof AnonymousAuthenticationToken){
+            return null;
+        } else {
+            return playerRepository.findByUserName(authentication.getName());
+        }
     }
 }
