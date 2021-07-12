@@ -61,6 +61,10 @@ public class SalvoController {
             return new ResponseEntity<>(getDefaultDTO("error", "Debe ingresar un email"), HttpStatus.FORBIDDEN);
         }
 
+        if(password.isEmpty()){
+            return new ResponseEntity<>(getDefaultDTO("error", "Debe ingresar una contraseña"), HttpStatus.FORBIDDEN);
+        }
+
         Player player = playerRepository.findByUserName(username);
         if(player != null){
             return new ResponseEntity<>(getDefaultDTO("error", "Este mail ya esta en uso"), HttpStatus.CONFLICT);
