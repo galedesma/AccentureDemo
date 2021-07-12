@@ -56,8 +56,8 @@ public class SalvoController {
     }
 
     @RequestMapping(path = "/players", method = RequestMethod.POST)
-    public ResponseEntity<Map<String, Object>> createPlayer(@RequestParam String username, @RequestParam String password){
-        if(username.isEmpty()){
+    public ResponseEntity<Map<String, Object>> createPlayer(@RequestParam String email, @RequestParam String password){
+        if(email.isEmpty()){
             return new ResponseEntity<>(getDefaultDTO("error", "Debe ingresar un email"), HttpStatus.FORBIDDEN);
         }
 
@@ -65,12 +65,12 @@ public class SalvoController {
             return new ResponseEntity<>(getDefaultDTO("error", "Debe ingresar una contraseña"), HttpStatus.FORBIDDEN);
         }
 
-        Player player = playerRepository.findByUserName(username);
+        Player player = playerRepository.findByUserName(email);
         if(player != null){
             return new ResponseEntity<>(getDefaultDTO("error", "Este mail ya esta en uso"), HttpStatus.CONFLICT);
         }
 
-        Player newPlayer = new Player(username, passwordEncoder.encode(password));
+        Player newPlayer = new Player(email, passwordEncoder.encode(password));
         playerRepository.save(newPlayer);
 
         return new ResponseEntity<>(getDefaultDTO("username", newPlayer.getUserName()), HttpStatus.CREATED);
