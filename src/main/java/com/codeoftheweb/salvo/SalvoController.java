@@ -27,13 +27,13 @@ public class SalvoController {
     @Autowired
     private GamePlayerRepository gpRepository;
 
-    @RequestMapping("/games")
+    @RequestMapping(path = "/games", method = RequestMethod.GET)
     public Map<String, Object> getAllGames(Authentication authentication){
         Map<String, Object> dto = new LinkedHashMap<>();
         List<Object> auxList = new ArrayList<>();
         List<Game> games = gameRepository.findAll();
         for(Game game: games){
-            auxList.add(getDTO(game));
+            auxList.add(getGameDTO(game));
         }
         if(authentication != null){
             dto.put("player", getPlayerDTO(authenticateUser(authentication)));
@@ -44,15 +44,54 @@ public class SalvoController {
         return dto;
     }
 
-    @RequestMapping("/game_view/{gamePlayerId}")
-    public Map<String, Object> getGameView(@PathVariable Long gamePlayerId){
+    @RequestMapping(path = "/games", method = RequestMethod.POST)
+    public ResponseEntity<Map<String, Object>> createGame(Authentication authentication){
+        if(authentication != null){
+            Game newGame = new Game(new Date());
+            gameRepository.save(newGame);
+
+            GamePlayer newGP = new GamePlayer(newGame, authenticateUser(authentication));
+            gpRepository.save(newGP);
+            return new ResponseEntity<>(getDefaultDTO("gpid", newGP.getId()), HttpStatus.CREATED);
+        } else {
+            return new ResponseEntity<>(getDefaultDTO("error", "Debe iniciar sesión"), HttpStatus.UNAUTHORIZED);
+        }
+    }
+
+    @RequestMapping(path= "game/{nn}/players", method = RequestMethod.POST)
+    public ResponseEntity<Map<String, Object>> joinGame(@PathVariable Long nn, Authentication authentication){
+
+        Optional<Game> currentGame = gameRepository.findById(nn);
+
+        if(authentication == null){
+            return new ResponseEntity<>(getDefaultDTO("error", "Debe iniciar sesión"), HttpStatus.UNAUTHORIZED);
+        } else if(currentGame.isEmpty()){
+            return new ResponseEntity<>(getDefaultDTO("error", "Este juego no existe"), HttpStatus.FORBIDDEN);
+        } else if(currentGame.get().getGamePlayers().size() >= 2) {
+            return new ResponseEntity<>(getDefaultDTO("error", "Sala llena"), HttpStatus.FORBIDDEN);
+        } else {
+            GamePlayer newGP = new GamePlayer(currentGame.get(), authenticateUser(authentication));
+            gpRepository.save(newGP);
+
+            return new ResponseEntity<>(getDefaultDTO("gpid", newGP.getId()), HttpStatus.CREATED);
+        }
+    }
+
+    @RequestMapping(path = "/game_view/{gamePlayerId}", method = RequestMethod.GET)
+    public ResponseEntity<Map<String, Object>> getGameView(@PathVariable Long gamePlayerId, Authentication authentication){
         GamePlayer gamePlayer = this.gpRepository.getById(gamePlayerId);
         Game game = this.gameRepository.getById(gamePlayer.getGame().getGameId());
 
-        Map<String, Object> dto = getDTO(game);
-        dto.put("ships", gamePlayer.getShips().stream().map(ship -> getShipDTO(ship)));
-        dto.put("salvoes", game.getGamePlayers().stream().flatMap(gp -> gp.getSalvoes().stream().map(salvo -> getSalvoDTO(salvo))));
-        return dto;
+        if(authenticateUser(authentication).getGamePlayers().contains(gamePlayer)) {
+            Map<String, Object> dto = getGameDTONoScores(game);
+            dto.put("ships", gamePlayer.getShips().stream().map(ship -> getShipDTO(ship)));
+            dto.put("salvoes", game.getGamePlayers().stream().flatMap(gp -> gp.getSalvoes().stream().map(salvo -> getSalvoDTO(salvo))));
+            dto.put("hits", getHitsDTO());
+
+            return new ResponseEntity<>(dto, HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(getDefaultDTO("error", "No tienes permiso para ver este juego"), HttpStatus.UNAUTHORIZED);
+        }
     }
 
     @RequestMapping(path = "/players", method = RequestMethod.POST)
@@ -76,12 +115,22 @@ public class SalvoController {
         return new ResponseEntity<>(getDefaultDTO("username", newPlayer.getUserName()), HttpStatus.CREATED);
     }
 
-    private Map<String, Object> getDTO(Game game){
+    private Map<String, Object> getGameDTO(Game game){
         Map<String, Object> dto = new LinkedHashMap<>();
         dto.put("id", game.getGameId());
         dto.put("created", game.getGameDate());
         dto.put("gamePlayers", game.getGamePlayers().stream().map(this::getGamePlayerDTO).collect(Collectors.toList()));
         dto.put("scores", game.getGamePlayers().stream().map(gp -> getScoreDTO(gp)));
+        return dto;
+    }
+
+    private Map<String, Object> getGameDTONoScores(Game game){
+        Map<String, Object> dto = new LinkedHashMap<>();
+        dto.put("id", game.getGameId());
+        dto.put("created", game.getGameDate());
+        dto.put("gameState", "PLACESHIPS");
+        dto.put("gamePlayers", game.getGamePlayers().stream().map(this::getGamePlayerDTO).collect(Collectors.toList()));
+
         return dto;
     }
 
@@ -124,6 +173,14 @@ public class SalvoController {
             dto.put("score", score.get().getScore());
             dto.put("finishDate", score.get().getFinishDate());
         }
+        return dto;
+    }
+
+    private Map<String, Object> getHitsDTO(){
+        Map<String, Object> dto = new LinkedHashMap<>();
+        dto.put("self", new ArrayList<>());
+        dto.put("opponent", new ArrayList<>());
+
         return dto;
     }
 

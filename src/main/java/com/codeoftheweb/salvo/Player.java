@@ -62,6 +62,10 @@ public class Player {
         scores.add(score);
     }
 
+    public Set<GamePlayer> getGamePlayers() {
+        return gamePlayers;
+    }
+
     public Set<Score> getScores(){
         return scores;
     }
