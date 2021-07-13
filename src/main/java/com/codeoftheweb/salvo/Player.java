@@ -1,6 +1,5 @@
 package com.codeoftheweb.salvo;
 
-import net.minidev.json.annotate.JsonIgnore;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
@@ -14,8 +13,9 @@ public class Player {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO, generator = "native")
     @GenericGenerator(name = "native", strategy = "native")
-    private long userId;
+    private long id;
     private String userName;
+    private String password;
 
     @OneToMany(mappedBy = "player", fetch =  FetchType.EAGER)
     Set<GamePlayer> gamePlayers = new HashSet<>();
@@ -27,20 +27,29 @@ public class Player {
 
     }
 
-    public Player(String user){
+    public Player(String user, String pass){
      userName = user;
+     password = pass;
     }
 
     public String getUserName() {
         return userName;
     }
 
-    public long getUserId() {
-        return userId;
+    public String getPassword() {
+        return password;
+    }
+
+    public long getId() {
+        return id;
     }
 
     public void setUserName(String userName) {
         this.userName = userName;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 
     public void addGamePlayer(GamePlayer gamePlayer){
@@ -57,22 +66,9 @@ public class Player {
         return scores;
     }
 
-//    public Score getScore(Game game){
-//        Optional<Score> myScore = this.scores.stream().filter(score -> score.getGame().getGameId() == game.getGameId()).findFirst();
-//
-//        if(myScore.isEmpty()){
-//            return null;
-//        } else {
-//            return myScore.get();
-//        }
-//    }
-
     public Optional<Score> getScore(Game game){
         return this.scores.stream().filter(score -> score.getGame().getGameId() == game.getGameId()).findFirst();
     }
 
 
-//    public List<Game> getGames(){
-//        return gamePlayers.stream().map(GamePlayer::getGame).collect(Collectors.toList());
-//    }
 }
