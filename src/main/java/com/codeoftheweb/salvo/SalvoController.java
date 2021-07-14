@@ -27,6 +27,9 @@ public class SalvoController {
     @Autowired
     private GamePlayerRepository gpRepository;
 
+    @Autowired
+    private ShipRepository shipRepository;
+
     @RequestMapping(path = "/games", method = RequestMethod.GET)
     public Map<String, Object> getAllGames(Authentication authentication){
         Map<String, Object> dto = new LinkedHashMap<>();
@@ -58,7 +61,31 @@ public class SalvoController {
         }
     }
 
-    @RequestMapping(path= "game/{nn}/players", method = RequestMethod.POST)
+    @RequestMapping(path = "/games/players/{gamePlayerId}/ships", method = RequestMethod.POST)
+    public ResponseEntity<?> placeShips(@PathVariable Long gamePlayerId, @RequestBody List<Ship> ships, Authentication authentication){
+
+        Optional<GamePlayer> currentGP = gpRepository.findById(gamePlayerId);
+
+        if(authentication == null){
+            return new ResponseEntity<>(getDefaultDTO("error", "Debes estar loggeado"), HttpStatus.UNAUTHORIZED);
+        } else if(currentGP.isEmpty()){
+            return new ResponseEntity<>(getDefaultDTO("error", "Este jugador no existe"), HttpStatus.UNAUTHORIZED);
+        } else if(authenticateUser(authentication).getGamePlayers().contains(currentGP)){
+            return new ResponseEntity<>(getDefaultDTO("error", "No puedes participar en este juego"), HttpStatus.UNAUTHORIZED);
+        } else if(currentGP.get().getShips().size() > 0) {
+            return new ResponseEntity<>(getDefaultDTO("error", "Este jugador ya posee naves colocadas"), HttpStatus.FORBIDDEN);
+        } else if(ships.size() != 5){
+            return new ResponseEntity<>(getDefaultDTO("error", "Se deben colocar 5 barcos exactamente"), HttpStatus.FORBIDDEN);
+        } else {
+            for(Ship ship: ships){
+                currentGP.get().addShip(ship);
+                shipRepository.save(ship);
+            }
+            return new ResponseEntity<>(getDefaultDTO("OK", "Barcos añadidos"), HttpStatus.CREATED);
+        }
+    }
+
+    @RequestMapping(path= "/game/{nn}/players", method = RequestMethod.POST)
     public ResponseEntity<Map<String, Object>> joinGame(@PathVariable Long nn, Authentication authentication){
 
         Optional<Game> currentGame = gameRepository.findById(nn);
@@ -151,7 +178,7 @@ public class SalvoController {
     private Map<String, Object> getShipDTO(Ship ship){
         Map<String, Object> dto = new LinkedHashMap<>();
         dto.put("type", ship.getType());
-        dto.put("locations", ship.getLocations());
+        dto.put("locations", ship.getShipLocations());
         return dto;
     }
 
