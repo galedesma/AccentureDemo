@@ -64,7 +64,7 @@ public class SalvoController {
             gpRepository.save(newGP);
             return new ResponseEntity<>(Utils.getDefaultDTO("gpid", newGP.getId()), HttpStatus.CREATED);
         } else {
-            return new ResponseEntity<>(Utils.getDefaultDTO("error", "Debe iniciar sesión"), HttpStatus.UNAUTHORIZED);
+            return new ResponseEntity<>(Utils.getDefaultDTO("error", "You must be logged in"), HttpStatus.UNAUTHORIZED);
         }
     }
 
@@ -74,22 +74,54 @@ public class SalvoController {
         Optional<GamePlayer> currentGP = gpRepository.findById(gamePlayerId);
 
         if(authentication == null){
-            return new ResponseEntity<>(Utils.getDefaultDTO("error", "Debes estar loggeado"), HttpStatus.UNAUTHORIZED);
-        } else if(currentGP.isEmpty()){
-            return new ResponseEntity<>(Utils.getDefaultDTO("error", "Este jugador no existe"), HttpStatus.UNAUTHORIZED);
-        } else if(authenticateUser(authentication).getGamePlayers().contains(currentGP.get())){
-            return new ResponseEntity<>(Utils.getDefaultDTO("error", "No puedes participar en este juego"), HttpStatus.UNAUTHORIZED);
-        } else if(currentGP.get().getShips().size() > 0) {
-            return new ResponseEntity<>(Utils.getDefaultDTO("error", "Este jugador ya posee naves colocadas"), HttpStatus.FORBIDDEN);
-        } else if(ships.size() != 5){
-            return new ResponseEntity<>(Utils.getDefaultDTO("error", "Se deben colocar 5 barcos exactamente"), HttpStatus.FORBIDDEN);
-        } else {
-            for(Ship ship: ships){
-                currentGP.get().addShip(ship);
-                shipRepository.save(ship);
-            }
-            return new ResponseEntity<>(Utils.getDefaultDTO("OK", "Barcos añadidos"), HttpStatus.CREATED);
+            return new ResponseEntity<>(Utils.getDefaultDTO("error", "You must be logged in"), HttpStatus.UNAUTHORIZED);
         }
+
+        if(currentGP.isEmpty()){
+            return new ResponseEntity<>(Utils.getDefaultDTO("error", "This game doesn't exist"), HttpStatus.UNAUTHORIZED);
+        }
+
+        if(!authenticateUser(authentication).getGamePlayers().contains(currentGP.get())){
+            return new ResponseEntity<>(Utils.getDefaultDTO("error", "You are not allowed to participate in this game"), HttpStatus.UNAUTHORIZED);
+        }
+
+        if(currentGP.get().getShips().size() > 0) {
+            return new ResponseEntity<>(Utils.getDefaultDTO("error", "This player already has their ships placed"), HttpStatus.FORBIDDEN);
+        }
+
+        if(ships.size() != 5){
+            return new ResponseEntity<>(Utils.getDefaultDTO("error", "You must place 5 ships exactly"), HttpStatus.FORBIDDEN);
+        }
+
+        for(Ship ship: ships){
+            if(ship.getType().equals("patrolboat") && ship.getShipLocations().size() != 2){
+                return new ResponseEntity<>(Utils.getDefaultDTO("error", "Ship " + ship.getType() + " must be exactly 2 cells long."), HttpStatus.FORBIDDEN);
+            }
+
+            if(ship.getType().equals("submarine") && ship.getShipLocations().size() != 3){
+                return new ResponseEntity<>(Utils.getDefaultDTO("error", "Ship " + ship.getType() + " must be exactly 3 cells long."), HttpStatus.FORBIDDEN);
+            }
+
+            if(ship.getType().equals("destroyer") && ship.getShipLocations().size() != 3){
+                return new ResponseEntity<>(Utils.getDefaultDTO("error", "Ship " + ship.getType() + " must be exactly 3 cells long."), HttpStatus.FORBIDDEN);
+            }
+
+            if(ship.getType().equals("battleship") && ship.getShipLocations().size() != 4){
+                return new ResponseEntity<>(Utils.getDefaultDTO("error", "Ship " + ship.getType() + " must be exactly 4 cells long."), HttpStatus.FORBIDDEN);
+            }
+
+            if(ship.getType().equals("carrier") && ship.getShipLocations().size() != 5){
+                return new ResponseEntity<>(Utils.getDefaultDTO("error", "Ship " + ship.getType() + " must be exactly 5 cells long."), HttpStatus.FORBIDDEN);
+            }
+        }
+
+        for(Ship ship: ships){
+            currentGP.get().addShip(ship);
+            shipRepository.save(ship);
+        }
+
+        return new ResponseEntity<>(Utils.getDefaultDTO("OK", "Ships placed"), HttpStatus.CREATED);
+
     }
 
     @RequestMapping(path= "/game/{nn}/players", method = RequestMethod.POST)
@@ -98,11 +130,11 @@ public class SalvoController {
         Optional<Game> currentGame = gameRepository.findById(nn);
 
         if(authentication == null){
-            return new ResponseEntity<>(Utils.getDefaultDTO("error", "Debe iniciar sesión"), HttpStatus.UNAUTHORIZED);
+            return new ResponseEntity<>(Utils.getDefaultDTO("error", "You must be logged in"), HttpStatus.UNAUTHORIZED);
         } else if(currentGame.isEmpty()){
-            return new ResponseEntity<>(Utils.getDefaultDTO("error", "Este juego no existe"), HttpStatus.FORBIDDEN);
+            return new ResponseEntity<>(Utils.getDefaultDTO("error", "This game doesn't exist"), HttpStatus.FORBIDDEN);
         } else if(currentGame.get().getGamePlayers().size() >= 2) {
-            return new ResponseEntity<>(Utils.getDefaultDTO("error", "Sala llena"), HttpStatus.FORBIDDEN);
+            return new ResponseEntity<>(Utils.getDefaultDTO("error", "This game is full"), HttpStatus.FORBIDDEN);
         } else {
             GamePlayer newGP = new GamePlayer(currentGame.get(), authenticateUser(authentication));
             gpRepository.save(newGP);
@@ -125,23 +157,23 @@ public class SalvoController {
 
             return new ResponseEntity<>(dto, HttpStatus.OK);
         } else {
-            return new ResponseEntity<>(Utils.getDefaultDTO("error", "No tienes permiso para ver este juego"), HttpStatus.UNAUTHORIZED);
+            return new ResponseEntity<>(Utils.getDefaultDTO("error", "You are not allowed to view this game"), HttpStatus.UNAUTHORIZED);
         }
     }
 
     @RequestMapping(path = "/players", method = RequestMethod.POST)
     public ResponseEntity<Map<String, Object>> createPlayer(@RequestParam String email, @RequestParam String password){
         if(email.isEmpty()){
-            return new ResponseEntity<>(Utils.getDefaultDTO("error", "Debe ingresar un email"), HttpStatus.FORBIDDEN);
+            return new ResponseEntity<>(Utils.getDefaultDTO("error", "You must enter an email"), HttpStatus.FORBIDDEN);
         }
 
         if(password.isEmpty()){
-            return new ResponseEntity<>(Utils.getDefaultDTO("error", "Debe ingresar una contraseña"), HttpStatus.FORBIDDEN);
+            return new ResponseEntity<>(Utils.getDefaultDTO("error", "You must enter a password"), HttpStatus.FORBIDDEN);
         }
 
         Player player = playerRepository.findByUserName(email);
         if(player != null){
-            return new ResponseEntity<>(Utils.getDefaultDTO("error", "Este mail ya esta en uso"), HttpStatus.CONFLICT);
+            return new ResponseEntity<>(Utils.getDefaultDTO("error", "This mail is already in use"), HttpStatus.CONFLICT);
         }
 
         Player newPlayer = new Player(email, passwordEncoder.encode(password));
