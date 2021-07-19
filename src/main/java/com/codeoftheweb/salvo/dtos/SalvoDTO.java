@@ -15,7 +15,7 @@ public class SalvoDTO {
     public SalvoDTO(Salvo salvo){
         this.turn = salvo.getTurn();
         this.player = salvo.getGamePlayer().getPlayer().getId();
-        this.locations = salvo.getLocations();
+        this.locations = salvo.getSalvoLocations();
     }
 
     public int getTurn() {

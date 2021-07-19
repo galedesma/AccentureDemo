@@ -2,10 +2,7 @@ package com.codeoftheweb.salvo.controllers;
 
 import com.codeoftheweb.salvo.dtos.*;
 import com.codeoftheweb.salvo.models.*;
-import com.codeoftheweb.salvo.repositories.GamePlayerRepository;
-import com.codeoftheweb.salvo.repositories.GameRepository;
-import com.codeoftheweb.salvo.repositories.PlayerRepository;
-import com.codeoftheweb.salvo.repositories.ShipRepository;
+import com.codeoftheweb.salvo.repositories.*;
 import com.codeoftheweb.salvo.utils.Utils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +14,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api")
@@ -36,6 +34,9 @@ public class SalvoController {
 
     @Autowired
     private ShipRepository shipRepository;
+
+    @Autowired
+    private SalvoRepository salvoRepository;
 
     @RequestMapping(path = "/games", method = RequestMethod.GET)
     public Map<String, Object> getAllGames(Authentication authentication){
@@ -122,6 +123,45 @@ public class SalvoController {
 
         return new ResponseEntity<>(Utils.getDefaultDTO("OK", "Ships placed"), HttpStatus.CREATED);
 
+    }
+
+    @RequestMapping(path="games/players/{gamePlayerId}/salvoes", method = RequestMethod.POST)
+    public ResponseEntity<Map<String, Object>> shootSalvo(@PathVariable Long gamePlayerId, @RequestBody Salvo salvo, Authentication authentication){
+
+        Optional<GamePlayer> currentGP = gpRepository.findById(gamePlayerId);
+        int currentTurn = 1;
+
+        if(authentication == null){
+            return new ResponseEntity<>(Utils.getDefaultDTO("error", "You must be logged in"), HttpStatus.UNAUTHORIZED);
+        }
+
+        if(currentGP.isEmpty()){
+            return new ResponseEntity<>(Utils.getDefaultDTO("error", "This game doesn't exist"), HttpStatus.UNAUTHORIZED);
+        }
+
+        if(!authenticateUser(authentication).getGamePlayers().contains(currentGP.get())){
+            return new ResponseEntity<>(Utils.getDefaultDTO("error", "You are not allowed to participate in this game"), HttpStatus.UNAUTHORIZED);
+        }
+
+        List<Integer> listOfTurns = currentGP.get().getSalvoes().stream().map(s -> s.getTurn()).collect(Collectors.toList());
+
+        if(listOfTurns.size() != 0){
+            currentTurn = listOfTurns.size() + 1;
+        }
+
+        if(salvo.getSalvoLocations().size() < 1){
+            return new ResponseEntity<>(Utils.getDefaultDTO("error", "You should fire at least once every turn"), HttpStatus.FORBIDDEN);
+        }
+
+        if(salvo.getSalvoLocations().size() > 5){
+            return new ResponseEntity<>(Utils.getDefaultDTO("error", "You shouldn't fire more than 5 times every turn"), HttpStatus.FORBIDDEN);
+        }
+
+        salvo.setTurn(currentTurn);
+        currentGP.get().addSalvo(salvo);
+        salvoRepository.save(salvo);
+
+        return new ResponseEntity<>(Utils.getDefaultDTO("OK","Salvo fired!"), HttpStatus.CREATED);
     }
 
     @RequestMapping(path= "/game/{nn}/players", method = RequestMethod.POST)
