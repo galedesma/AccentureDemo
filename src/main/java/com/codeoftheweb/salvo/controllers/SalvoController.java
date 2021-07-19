@@ -190,10 +190,7 @@ public class SalvoController {
 
         if(authenticateUser(authentication).getGamePlayers().contains(gamePlayer)) {
             ObjectMapper oMapper = new ObjectMapper();
-            Map<String, Object> dto = oMapper.convertValue(new GameViewDTO(game), Map.class);
-            dto.put("ships", gamePlayer.getShips().stream().map(ship -> new ShipDTO(ship)));
-            dto.put("salvoes", game.getGamePlayers().stream().flatMap(gp -> gp.getSalvoes().stream().map(salvo -> new SalvoDTO(salvo))));
-            dto.put("hits", new HitsDTO());
+            Map<String, Object> dto = oMapper.convertValue(new GameViewDTO(game, gamePlayer), Map.class);
 
             return new ResponseEntity<>(dto, HttpStatus.OK);
         } else {
