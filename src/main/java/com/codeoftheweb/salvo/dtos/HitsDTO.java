@@ -3,24 +3,17 @@ package com.codeoftheweb.salvo.dtos;
 import com.codeoftheweb.salvo.models.Game;
 import com.codeoftheweb.salvo.models.GamePlayer;
 import com.codeoftheweb.salvo.models.Salvo;
-import com.codeoftheweb.salvo.models.Ship;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 public class HitsDTO {
 
-    private List<String> self;
+    private List<Object> self = new ArrayList<>();
 
-    private List<String> opponent;
-
-    public HitsDTO(){
-        this.self = new ArrayList<>();
-        this.opponent = new ArrayList<>();
-    }
+    private List<Object> opponent = new ArrayList<>();
 
     public HitsDTO(Game game, GamePlayer gamePlayer){
 
@@ -30,22 +23,24 @@ public class HitsDTO {
             this.self = new ArrayList<>();
             this.opponent = new ArrayList<>();
         } else {
-            List<String> ownShips = gamePlayer.getShips().stream().flatMap(ship -> ship.getShipLocations().stream()).collect(Collectors.toList());
-            List<String> ownSalvoes = gamePlayer.getSalvoes().stream().flatMap(salvo -> salvo.getSalvoLocations().stream()).collect(Collectors.toList());
+            Set<Salvo> ownSalvoes = gamePlayer.getSalvoes();
+            Set<Salvo> oppSalvoes = opp.get().getSalvoes();
 
-            List<String> oppShips = opp.get().getShips().stream().flatMap(ship -> ship.getShipLocations().stream()).collect(Collectors.toList());
-            List<String> oppSalvoes = opp.get().getSalvoes().stream().flatMap(salvo -> salvo.getSalvoLocations().stream()).collect(Collectors.toList());
+            for(Salvo salvo: ownSalvoes){
+                this.self.add(new DamageReportDTO(salvo, opp.get()));
+            }
 
-            this.self = ownShips.stream().distinct().filter(shipPosition -> oppSalvoes.contains(shipPosition)).collect(Collectors.toList());
-            this.opponent = oppShips.stream().distinct().filter(shipPosition -> ownSalvoes.contains(shipPosition)).collect(Collectors.toList());
+            for(Salvo salvo: oppSalvoes){
+                this.opponent.add(new DamageReportDTO(salvo, gamePlayer));
+            }
         }
     }
 
-    public List<String> getSelf() {
+    public List<Object> getSelf() {
         return self;
     }
 
-    public List<String> getOpponent() {
+    public List<Object> getOpponent() {
         return opponent;
     }
 }

@@ -56,11 +56,11 @@ public class SalvoApplication {
 			Player talmeida = new Player("t.almeida@ctu.gov", passwordEncoder().encode("kb"));
 			Player dpalmer = new Player("d.palmer@whitehouse.gov", passwordEncoder().encode("mole"));
 
-			Ship ship1a = new Ship("Destroyer", Arrays.asList("H2","H3","H4"));
-			Ship ship1b = new Ship("Submarine", Arrays.asList("E1","F1","G1"));
-			Ship ship1c = new Ship("Patrol Boat", Arrays.asList("B4","B5"));
-			Ship ship2a = new Ship("Destroyer", Arrays.asList("B5", "C5", "D5"));
-			Ship ship2b = new Ship("Patrol Boat", Arrays.asList("F1", "F2"));
+			Ship ship1a = new Ship("destroyer", Arrays.asList("H2","H3","H4"));
+			Ship ship1b = new Ship("submarine", Arrays.asList("E1","F1","G1"));
+			Ship ship1c = new Ship("patrolboat", Arrays.asList("B4","B5"));
+			Ship ship2a = new Ship("destroyer", Arrays.asList("B5", "C5", "D5"));
+			Ship ship2b = new Ship("patrolboat", Arrays.asList("F1", "F2"));
 			Ship ship3a = new Ship("Destroyer", Arrays.asList("B5", "C5", "D5"));
 			Ship ship3b = new Ship("Patrol Boat", Arrays.asList("C6","C7"));
 			Ship ship4a = new Ship("Submarine", Arrays.asList("A2","A3","A4"));
@@ -83,7 +83,7 @@ public class SalvoApplication {
 			Salvo salvo7 = new Salvo(Arrays.asList("A3", "A4", "F7"),1);
 			Salvo salvo8 = new Salvo(Arrays.asList("A2", "G6", "H6"),1);
 			Salvo salvo9 = new Salvo(Arrays.asList("A1", "A2", "A3"),1);
-			Salvo salvo10 = new Salvo(Arrays.asList("G6", "G7","G8"), 2);
+			Salvo salvo10 = new Salvo(Arrays.asList("G6", "G7","G8"), 3);
 
 			Score score1 = new Score(1.0, game1, jbauer);
 			Score score2 = new Score(0.0, game1, cobrian);

@@ -129,7 +129,7 @@ public class SalvoController {
     public ResponseEntity<Map<String, Object>> shootSalvo(@PathVariable Long gamePlayerId, @RequestBody Salvo salvo, Authentication authentication){
 
         Optional<GamePlayer> currentGP = gpRepository.findById(gamePlayerId);
-        int currentTurn = 1;
+        int currentTurn = 0;
 
         if(authentication == null){
             return new ResponseEntity<>(Utils.getDefaultDTO("error", "You must be logged in"), HttpStatus.UNAUTHORIZED);
@@ -145,8 +145,8 @@ public class SalvoController {
 
         List<Integer> listOfTurns = currentGP.get().getSalvoes().stream().map(s -> s.getTurn()).collect(Collectors.toList());
 
-        if(listOfTurns.size() != 0){
-            currentTurn = listOfTurns.size() + 1;
+        if(listOfTurns.size() >= 1){
+            currentTurn = listOfTurns.size();
         }
 
         if(salvo.getSalvoLocations().size() < 1){
