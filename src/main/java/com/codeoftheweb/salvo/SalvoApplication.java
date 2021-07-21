@@ -59,6 +59,7 @@ public class SalvoApplication {
 			Ship ship1a = new Ship("destroyer", Arrays.asList("H2","H3","H4"));
 			Ship ship1b = new Ship("submarine", Arrays.asList("E1","F1","G1"));
 			Ship ship1c = new Ship("patrolboat", Arrays.asList("B4","B5"));
+			Ship ship1d = new Ship("carrier", Arrays.asList("E10", "F10", "G10", "H10", "I10"));
 			Ship ship2a = new Ship("destroyer", Arrays.asList("B5", "C5", "D5"));
 			Ship ship2b = new Ship("patrolboat", Arrays.asList("F1", "F2"));
 			Ship ship3a = new Ship("Destroyer", Arrays.asList("B5", "C5", "D5"));
@@ -72,8 +73,10 @@ public class SalvoApplication {
 
 			Salvo salvo1a = new Salvo(Arrays.asList("B5", "C5", "F1"),1);
 			Salvo salvo1b = new Salvo(Arrays.asList("F2", "D5"),2);
-			Salvo salvo2a = new Salvo(Arrays.asList("B4", "B5", "B6"),1);
-			Salvo salvo2b = new Salvo(Arrays.asList("E1", "H3", "A2"),2);
+			Salvo salvo1c = new Salvo(Arrays.asList("G6", "G7","G8"), 3);
+			Salvo salvo2a = new Salvo(Arrays.asList("B4", "B5", "B6", "F1"),1);
+			Salvo salvo2b = new Salvo(Arrays.asList("E1", "H3", "A2", "H2"),2);
+			Salvo salvo2c = new Salvo(Arrays.asList("E8", "E9", "E10", "G10", "I10"),3);
 			Salvo salvo3a = new Salvo(Arrays.asList("A2", "A4", "G6"),1);
 			Salvo salvo3b = new Salvo(Arrays.asList("A3", "H6"),2);
 			Salvo salvo4a = new Salvo(Arrays.asList("B5", "D5", "C7"),1);
@@ -83,7 +86,7 @@ public class SalvoApplication {
 			Salvo salvo7 = new Salvo(Arrays.asList("A3", "A4", "F7"),1);
 			Salvo salvo8 = new Salvo(Arrays.asList("A2", "G6", "H6"),1);
 			Salvo salvo9 = new Salvo(Arrays.asList("A1", "A2", "A3"),1);
-			Salvo salvo10 = new Salvo(Arrays.asList("G6", "G7","G8"), 3);
+
 
 			Score score1 = new Score(1.0, game1, jbauer);
 			Score score2 = new Score(0.0, game1, cobrian);
@@ -103,6 +106,7 @@ public class SalvoApplication {
 			gp1.addShip(ship1a);
 			gp1.addShip(ship1b);
 			gp1.addShip(ship1c);
+			gp1.addShip(ship1d);
 
 			GamePlayer gp2 = new GamePlayer();
 			gp2.setGame(game1);
@@ -156,8 +160,10 @@ public class SalvoApplication {
 
 			gp1.addSalvo(salvo1a);
 			gp1.addSalvo(salvo1b);
+			gp1.addSalvo(salvo1c);
 			gp2.addSalvo(salvo2a);
 			gp2.addSalvo(salvo2b);
+			gp2.addSalvo(salvo2c);
 			gp3.addSalvo(salvo3a);
 			gp3.addSalvo(salvo3b);
 			gp4.addSalvo(salvo4a);
@@ -167,7 +173,7 @@ public class SalvoApplication {
 			gp7.addSalvo(salvo7);
 			gp8.addSalvo(salvo8);
 			gp9.addSalvo(salvo9);
-			gp1.addSalvo(salvo10);
+
 
 			gameRepo.save(game1);
 			gameRepo.save(game2);
@@ -175,6 +181,7 @@ public class SalvoApplication {
 			gameRepo.save(game4);
 			gameRepo.save(game5);
 			gameRepo.save(game6);
+
 			playerRepo.save(jbauer);
 			playerRepo.save(cobrian);
 			playerRepo.save(talmeida);
@@ -195,6 +202,7 @@ public class SalvoApplication {
 			shipRepo.save(ship1a);
 			shipRepo.save(ship1b);
 			shipRepo.save(ship1c);
+			shipRepo.save(ship1d);
 			shipRepo.save(ship2a);
 			shipRepo.save(ship2b);
 			shipRepo.save(ship3a);
@@ -207,8 +215,10 @@ public class SalvoApplication {
 
 			salvoRepo.save(salvo1a);
 			salvoRepo.save(salvo1b);
+			salvoRepo.save(salvo1c);
 			salvoRepo.save(salvo2a);
 			salvoRepo.save(salvo2b);
+			salvoRepo.save(salvo2c);
 			salvoRepo.save(salvo3a);
 			salvoRepo.save(salvo3b);
 			salvoRepo.save(salvo4a);
@@ -218,7 +228,6 @@ public class SalvoApplication {
 			salvoRepo.save(salvo7);
 			salvoRepo.save(salvo8);
 			salvoRepo.save(salvo9);
-			salvoRepo.save(salvo10);
 
 			scoreRepo.save(score1);
 			scoreRepo.save(score2);

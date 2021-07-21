@@ -74,30 +74,27 @@ public class DamageReportDTO {
 
         List<String> locations = targetShip.get().getShipLocations();
         count = (int) impact.stream().filter(i -> locations.contains(i)).count();
-        addToCounter(count, targetShip.get().getType());
 
-        return count;
-    }
-
-    private void addToCounter(int quantity, String type){
         if(type.equals("patrolboat")){
-            this.patrolboatCounter = this.patrolboatCounter + quantity;
+            this.patrolboatCounter = count;
         }
 
         if(type.equals("submarine")){
-            this.submarineCounter = this.submarineCounter + quantity;
+            this.submarineCounter = count;
         }
 
         if(type.equals("destroyer")){
-            this.destroyerCounter = this.destroyerCounter + quantity;
+            this.destroyerCounter = count;
         }
 
         if(type.equals("battleship")){
-            this.battleshipCounter = this.battleshipCounter + quantity;
+            this.battleshipCounter = count;
         }
 
         if(type.equals("carrier")){
-            this.carrierCounter = this.carrierCounter + quantity;
+            this.carrierCounter = count;
         }
+
+        return count;
     }
 }
