@@ -143,6 +143,17 @@ public class SalvoController {
             return new ResponseEntity<>(Utils.getDefaultDTO("error", "You are not allowed to participate in this game"), HttpStatus.UNAUTHORIZED);
         }
 
+        Game currentGame = currentGP.get().getGame();
+        Optional<GamePlayer> opponent = currentGame.getGamePlayers().stream().filter(gp -> gp != currentGP.get()).findFirst();
+
+        if(opponent.isEmpty()){
+            return new ResponseEntity<>(Utils.getDefaultDTO("error", "You don't have an opponent yet"), HttpStatus.FORBIDDEN);
+        }
+
+        if(currentGP.get().getSalvoes().size() > opponent.get().getSalvoes().size()){
+            return new ResponseEntity<>(Utils.getDefaultDTO("error", "You must wait for your opponent to make their shot"), HttpStatus.FORBIDDEN);
+        }
+
         List<Integer> listOfTurns = currentGP.get().getSalvoes().stream().map(s -> s.getTurn()).collect(Collectors.toList());
 
         if(listOfTurns.size() >= 1){
@@ -157,7 +168,7 @@ public class SalvoController {
             return new ResponseEntity<>(Utils.getDefaultDTO("error", "You shouldn't fire more than 5 times every turn"), HttpStatus.FORBIDDEN);
         }
 
-        salvo.setTurn(currentTurn);
+        salvo.setTurn(currentTurn + 1);
         currentGP.get().addSalvo(salvo);
         salvoRepository.save(salvo);
 
