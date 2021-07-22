@@ -2,7 +2,7 @@ package com.codeoftheweb.salvo.dtos;
 
 import com.codeoftheweb.salvo.models.GamePlayer;
 import com.codeoftheweb.salvo.models.Salvo;
-import com.codeoftheweb.salvo.models.Ship;
+import com.codeoftheweb.salvo.utils.Utils;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -17,12 +17,6 @@ public class DamageReportDTO {
 
     private int missed;
 
-    private int carrierCounter = 0;
-    private int battleshipCounter = 0;
-    private int destroyerCounter = 0;
-    private int submarineCounter = 0;
-    private int patrolboatCounter = 0;
-
     public DamageReportDTO(Salvo salvo, GamePlayer opponent){
         this.turn = salvo.getTurn();
 
@@ -31,11 +25,17 @@ public class DamageReportDTO {
 
         this.hitLocations = oppShips.stream().distinct().filter(shipPosition -> ownSalvo.contains(shipPosition)).collect(Collectors.toList());
 
-        damages.put("carrierHits", countHits(this.hitLocations, opponent, "carrier"));
-        damages.put("battleshipHits", countHits(this.hitLocations, opponent, "battleship"));
-        damages.put("destroyerHits", countHits(this.hitLocations, opponent, "destroyer"));
-        damages.put("submarineHits", countHits(this.hitLocations, opponent, "submarine"));
-        damages.put("patrolboatHits", countHits(this.hitLocations, opponent, "patrolboat"));
+        int carrierCounter = Utils.countHits(this.hitLocations, opponent, "carrier");
+        int battleshipCounter = Utils.countHits(this.hitLocations, opponent, "battleship");
+        int destroyerCounter = Utils.countHits(this.hitLocations, opponent, "destroyer");
+        int submarineCounter = Utils.countHits(this.hitLocations, opponent, "submarine");
+        int patrolboatCounter = Utils.countHits(this.hitLocations, opponent, "patrolboat");
+
+        damages.put("carrierHits", carrierCounter);
+        damages.put("battleshipHits", battleshipCounter);
+        damages.put("destroyerHits", destroyerCounter);
+        damages.put("submarineHits", submarineCounter);
+        damages.put("patrolboatHits", patrolboatCounter);
 
         damages.put("carrier", carrierCounter);
         damages.put("battleship", battleshipCounter);
@@ -60,41 +60,5 @@ public class DamageReportDTO {
 
     public int getMissed() {
         return missed;
-    }
-
-    private int countHits(List<String> impact, GamePlayer target, String type){
-        int count = 0;
-
-        Set<Ship> ships = target.getShips();
-        Optional<Ship> targetShip = ships.stream().filter(ship -> ship.getType().equals(type)).findFirst();
-
-        if(targetShip.isEmpty()){
-            return count;
-        }
-
-        List<String> locations = targetShip.get().getShipLocations();
-        count = (int) impact.stream().filter(i -> locations.contains(i)).count();
-
-        if(type.equals("patrolboat")){
-            this.patrolboatCounter = count;
-        }
-
-        if(type.equals("submarine")){
-            this.submarineCounter = count;
-        }
-
-        if(type.equals("destroyer")){
-            this.destroyerCounter = count;
-        }
-
-        if(type.equals("battleship")){
-            this.battleshipCounter = count;
-        }
-
-        if(type.equals("carrier")){
-            this.carrierCounter = count;
-        }
-
-        return count;
     }
 }
