@@ -67,12 +67,12 @@ public class GameViewDTO {
 
         Optional<GamePlayer> opp = game.getGamePlayers().stream().filter(gp -> gp != gamePlayer).findFirst();
 
-        if(opp.isEmpty()){
-            return GameState.WAITINGFOROPP;
-        }
-
         if(gamePlayer.getShips().size() == 0){
             return GameState.PLACESHIPS;
+        }
+
+        if(opp.isEmpty()){
+            return GameState.WAITINGFOROPP;
         }
 
         if(opp.get().getShips().size() == 0 || gamePlayer.getSalvoes().size() > opp.get().getSalvoes().size()){
