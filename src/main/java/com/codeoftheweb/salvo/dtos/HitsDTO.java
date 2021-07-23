@@ -22,8 +22,8 @@ public class HitsDTO {
             this.self = new ArrayList<>();
             this.opponent = new ArrayList<>();
         } else {
-            this.self = Utils.getReport(gamePlayer, opp.get());
-            this.opponent = Utils.getReport(opp.get(), gamePlayer);
+            this.opponent = Utils.getReport(gamePlayer, opp.get());
+            this.self = Utils.getReport(opp.get(), gamePlayer);
         }
     }
 

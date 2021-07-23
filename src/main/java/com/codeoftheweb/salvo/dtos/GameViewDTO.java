@@ -2,10 +2,9 @@ package com.codeoftheweb.salvo.dtos;
 
 import com.codeoftheweb.salvo.models.Game;
 import com.codeoftheweb.salvo.models.GamePlayer;
-import com.codeoftheweb.salvo.models.Salvo;
+import com.codeoftheweb.salvo.utils.GameState;
 
-import java.util.Date;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class GameViewDTO {
@@ -14,7 +13,7 @@ public class GameViewDTO {
 
     private Date created;
 
-    private String gameState;
+    private GameState gameState;
 
     private Set<GamePlayerDTO> gamePlayers;
 
@@ -24,10 +23,12 @@ public class GameViewDTO {
 
     private HitsDTO hits;
 
+    private GameState result;
+
     public GameViewDTO(Game game, GamePlayer gamePlayer){
         this.id = game.getGameId();
         this.created = game.getGameDate();
-        this.gameState = "PLACESHIPS";
+        this.gameState = setGameState(game, gamePlayer);
         this.gamePlayers = game.getGamePlayers().stream().map(gp -> new GamePlayerDTO(gp)).collect(Collectors.toSet());
         this.ships = gamePlayer.getShips().stream().map(ship -> new ShipDTO(ship)).collect(Collectors.toSet());
         this.salvoes = game.getGamePlayers().stream().flatMap(gp -> gp.getSalvoes().stream().map(salvo -> new SalvoDTO(salvo))).collect(Collectors.toSet());
@@ -42,7 +43,7 @@ public class GameViewDTO {
         return created;
     }
 
-    public String getGameState() {
+    public GameState getGameState() {
         return gameState;
     }
 
@@ -60,5 +61,60 @@ public class GameViewDTO {
 
     public HitsDTO getHits() {
         return hits;
+    }
+
+    public GameState setGameState(Game game, GamePlayer gamePlayer) {
+
+        Optional<GamePlayer> opp = game.getGamePlayers().stream().filter(gp -> gp != gamePlayer).findFirst();
+
+        if(opp.isEmpty()){
+            return GameState.WAITINGFOROPP;
+        }
+
+        if(gamePlayer.getShips().size() == 0){
+            return GameState.PLACESHIPS;
+        }
+
+        if(opp.get().getShips().size() == 0){
+            return GameState.WAIT;
+        }
+
+        if(gamePlayer.getSalvoes().size() > opp.get().getSalvoes().size()){
+            return GameState.WAIT;
+        }
+
+        if(isGameOver(gamePlayer, opp.get())){
+            return result;
+        }
+
+        return GameState.PLAY;
+    }
+
+    private boolean isGameOver(GamePlayer self, GamePlayer opponent){
+        List<String> selfShips = self.getShips().stream().flatMap(ship -> ship.getShipLocations().stream()).collect(Collectors.toList());
+        List<String> oppShips = opponent.getShips().stream().flatMap(ship -> ship.getShipLocations().stream()).collect(Collectors.toList());
+
+        List<String> selfSalvo = self.getSalvoes().stream().flatMap(salvo -> salvo.getSalvoLocations().stream()).collect(Collectors.toList());
+        List<String> oppSalvo = opponent.getSalvoes().stream().flatMap(salvo -> salvo.getSalvoLocations().stream()).collect(Collectors.toList());
+
+        List<String> oppHits = selfShips.stream().filter(shipPosition -> oppSalvo.contains(shipPosition)).collect(Collectors.toList());
+        List<String> selfHits = oppShips.stream().filter(shipPosition -> selfSalvo.contains(shipPosition)).collect(Collectors.toList());
+
+        if((oppHits.size() == selfHits.size()) && oppHits.size() != 0 && oppHits.size() == selfShips.size()){
+            result = GameState.TIE;
+            return true;
+        }
+
+        if(selfShips.size() == oppHits.size()){
+            result = GameState.LOST;
+            return true;
+        }
+
+        if (oppShips.size() == selfHits.size()){
+            result = GameState.WON;
+            return true;
+        }
+
+        return false;
     }
 }

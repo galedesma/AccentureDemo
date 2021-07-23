@@ -3,6 +3,7 @@ package com.codeoftheweb.salvo.controllers;
 import com.codeoftheweb.salvo.dtos.*;
 import com.codeoftheweb.salvo.models.*;
 import com.codeoftheweb.salvo.repositories.*;
+import com.codeoftheweb.salvo.utils.GameState;
 import com.codeoftheweb.salvo.utils.Utils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,6 +38,9 @@ public class SalvoController {
 
     @Autowired
     private SalvoRepository salvoRepository;
+
+    @Autowired
+    private ScoreRepository scoreRepository;
 
     @RequestMapping(path = "/games", method = RequestMethod.GET)
     public Map<String, Object> getAllGames(Authentication authentication){
@@ -196,12 +200,45 @@ public class SalvoController {
 
     @RequestMapping(path = "/game_view/{gamePlayerId}", method = RequestMethod.GET)
     public ResponseEntity<Map<String, Object>> getGameView(@PathVariable Long gamePlayerId, Authentication authentication){
-        GamePlayer gamePlayer = this.gpRepository.getById(gamePlayerId);
-        Game game = this.gameRepository.getById(gamePlayer.getGame().getGameId());
+        Optional<GamePlayer> gamePlayer = this.gpRepository.findById(gamePlayerId);
 
-        if(authenticateUser(authentication).getGamePlayers().contains(gamePlayer)) {
+        if(gamePlayer.isEmpty()){
+            return new ResponseEntity<>(Utils.getDefaultDTO("error", "This gamePlayer doesn't exist yet!"), HttpStatus.UNAUTHORIZED);
+        }
+
+        Game game = this.gameRepository.getById(gamePlayer.get().getGame().getGameId());
+
+        Optional<GamePlayer> opponent = game.getGamePlayers().stream().filter(gp -> gp != gamePlayer.get()).findFirst();
+
+        if(authenticateUser(authentication).getGamePlayers().contains(gamePlayer.get())) {
             ObjectMapper oMapper = new ObjectMapper();
-            Map<String, Object> dto = oMapper.convertValue(new GameViewDTO(game, gamePlayer), Map.class);
+            GameViewDTO currentGameView = new GameViewDTO(game, gamePlayer.get());
+
+            if(currentGameView.getGameState() == GameState.WON){
+                Score winnerScore = new Score(1.0, game, gamePlayer.get().getPlayer());
+                Score loserScore = new Score(0.0, game, opponent.get().getPlayer());
+
+                scoreRepository.save(winnerScore);
+                scoreRepository.save(loserScore);
+            }
+
+            if(currentGameView.getGameState() == GameState.LOST){
+                Score winnerScore = new Score(1.0, game, opponent.get().getPlayer());
+                Score loserScore = new Score(0.0, game, gamePlayer.get().getPlayer());
+
+                scoreRepository.save(winnerScore);
+                scoreRepository.save(loserScore);
+            }
+
+            if(currentGameView.getGameState() == GameState.TIE){
+                Score tieScore1 = new Score(0.5, game, gamePlayer.get().getPlayer());
+                Score tieScore2 = new Score(0.5, game, opponent.get().getPlayer());
+
+                scoreRepository.save(tieScore1);
+                scoreRepository.save(tieScore2);
+            }
+
+            Map<String, Object> dto = oMapper.convertValue(currentGameView, Map.class);
 
             return new ResponseEntity<>(dto, HttpStatus.OK);
         } else {
