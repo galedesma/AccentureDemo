@@ -75,11 +75,7 @@ public class GameViewDTO {
             return GameState.PLACESHIPS;
         }
 
-        if(opp.get().getShips().size() == 0){
-            return GameState.WAIT;
-        }
-
-        if(gamePlayer.getSalvoes().size() > opp.get().getSalvoes().size()){
+        if(opp.get().getShips().size() == 0 || gamePlayer.getSalvoes().size() > opp.get().getSalvoes().size()){
             return GameState.WAIT;
         }
 
@@ -100,21 +96,22 @@ public class GameViewDTO {
         List<String> oppHits = selfShips.stream().filter(shipPosition -> oppSalvo.contains(shipPosition)).collect(Collectors.toList());
         List<String> selfHits = oppShips.stream().filter(shipPosition -> selfSalvo.contains(shipPosition)).collect(Collectors.toList());
 
-        if((oppHits.size() == selfHits.size()) && oppHits.size() != 0 && oppHits.size() == selfShips.size()){
-            result = GameState.TIE;
-            return true;
-        }
+        if(self.getSalvoes().size() == opponent.getSalvoes().size()){
+            if((oppHits.size() == selfHits.size()) && oppHits.size() != 0 && oppHits.size() == selfShips.size()){
+                result = GameState.TIE;
+                return true;
+            }
 
-        if(selfShips.size() == oppHits.size()){
-            result = GameState.LOST;
-            return true;
-        }
+            if(selfShips.size() == oppHits.size()){
+                result = GameState.LOST;
+                return true;
+            }
 
-        if (oppShips.size() == selfHits.size()){
-            result = GameState.WON;
-            return true;
+            if (oppShips.size() == selfHits.size()){
+                result = GameState.WON;
+                return true;
+            }
         }
-
         return false;
     }
 }

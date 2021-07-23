@@ -208,34 +208,23 @@ public class SalvoController {
 
         Game game = this.gameRepository.getById(gamePlayer.get().getGame().getGameId());
 
-        Optional<GamePlayer> opponent = game.getGamePlayers().stream().filter(gp -> gp != gamePlayer.get()).findFirst();
-
         if(authenticateUser(authentication).getGamePlayers().contains(gamePlayer.get())) {
             ObjectMapper oMapper = new ObjectMapper();
             GameViewDTO currentGameView = new GameViewDTO(game, gamePlayer.get());
 
             if(currentGameView.getGameState() == GameState.WON){
                 Score winnerScore = new Score(1.0, game, gamePlayer.get().getPlayer());
-                Score loserScore = new Score(0.0, game, opponent.get().getPlayer());
-
                 scoreRepository.save(winnerScore);
-                scoreRepository.save(loserScore);
             }
 
             if(currentGameView.getGameState() == GameState.LOST){
-                Score winnerScore = new Score(1.0, game, opponent.get().getPlayer());
                 Score loserScore = new Score(0.0, game, gamePlayer.get().getPlayer());
-
-                scoreRepository.save(winnerScore);
                 scoreRepository.save(loserScore);
             }
 
             if(currentGameView.getGameState() == GameState.TIE){
-                Score tieScore1 = new Score(0.5, game, gamePlayer.get().getPlayer());
-                Score tieScore2 = new Score(0.5, game, opponent.get().getPlayer());
-
-                scoreRepository.save(tieScore1);
-                scoreRepository.save(tieScore2);
+                Score tieScore = new Score(0.5, game, gamePlayer.get().getPlayer());
+                scoreRepository.save(tieScore);
             }
 
             Map<String, Object> dto = oMapper.convertValue(currentGameView, Map.class);
