@@ -3,6 +3,8 @@ package com.codeoftheweb.salvo.controllers;
 import com.codeoftheweb.salvo.dtos.*;
 import com.codeoftheweb.salvo.models.*;
 import com.codeoftheweb.salvo.repositories.*;
+import com.codeoftheweb.salvo.service.GameService;
+import com.codeoftheweb.salvo.service.GameServiceImpl;
 import com.codeoftheweb.salvo.utils.GameState;
 import com.codeoftheweb.salvo.utils.Utils;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -42,16 +44,19 @@ public class SalvoController {
     @Autowired
     private ScoreRepository scoreRepository;
 
+    @Autowired
+    private GameService gameService;
+
     @RequestMapping(path = "/games", method = RequestMethod.GET)
     public Map<String, Object> getAllGames(Authentication authentication){
         Map<String, Object> dto = new LinkedHashMap<>();
         List<Object> auxList = new ArrayList<>();
         List<Game> games = gameRepository.findAll();
         for(Game game: games){
-            auxList.add(new GameDTO(game));
+            auxList.add(gameService.makeGameDTO(game));
         }
         if(authentication != null){
-            dto.put("player", new PlayerDTO(authenticateUser(authentication)));
+            dto.put("player", gameService.makePlayerDTO(authenticateUser(authentication)));
         } else {
             dto.put("player", "Guest");
         }
@@ -210,7 +215,7 @@ public class SalvoController {
 
         if(authenticateUser(authentication).getGamePlayers().contains(gamePlayer.get())) {
             ObjectMapper oMapper = new ObjectMapper();
-            GameViewDTO currentGameView = new GameViewDTO(game, gamePlayer.get());
+            GameViewDTO currentGameView = gameService.makeGameViewDTO(game, gamePlayer.get());
 
             if(currentGameView.getGameState() == GameState.WON){
                 Score winnerScore = new Score(1.0, game, gamePlayer.get().getPlayer());

@@ -1,16 +1,16 @@
 package com.codeoftheweb.salvo.dtos;
 
-import com.codeoftheweb.salvo.models.GamePlayer;
-
 public class GamePlayerDTO {
 
     private long id;
 
     private PlayerDTO player;
 
-    public GamePlayerDTO(GamePlayer gamePlayer){
-        this.id = gamePlayer.getId();
-        this.player = new PlayerDTO(gamePlayer.getPlayer());
+    public GamePlayerDTO(){}
+
+    public GamePlayerDTO(long id, PlayerDTO player){
+        this.id = id;
+        this.player = player;
     }
 
     public long getId() {
@@ -19,5 +19,13 @@ public class GamePlayerDTO {
 
     public PlayerDTO getPlayer() {
         return player;
+    }
+
+    public void setId(long id) {
+        this.id = id;
+    }
+
+    public void setPlayer(PlayerDTO player) {
+        this.player = player;
     }
 }

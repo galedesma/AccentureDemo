@@ -1,11 +1,6 @@
 package com.codeoftheweb.salvo.dtos;
 
-import com.codeoftheweb.salvo.models.GamePlayer;
-import com.codeoftheweb.salvo.models.Salvo;
-import com.codeoftheweb.salvo.utils.Utils;
-
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class DamageReportDTO {
 
@@ -17,33 +12,13 @@ public class DamageReportDTO {
 
     private int missed;
 
-    public DamageReportDTO(Salvo salvo, GamePlayer opponent){
-        this.turn = salvo.getTurn();
+    public DamageReportDTO(){}
 
-        List<String> ownSalvo = salvo.getSalvoLocations().stream().collect(Collectors.toList());
-        List<String> oppShips = opponent.getShips().stream().flatMap(ship -> ship.getShipLocations().stream()).collect(Collectors.toList());
-
-        this.hitLocations = oppShips.stream().distinct().filter(shipPosition -> ownSalvo.contains(shipPosition)).collect(Collectors.toList());
-
-        int carrierCounter = Utils.countHits(this.hitLocations, opponent, "carrier");
-        int battleshipCounter = Utils.countHits(this.hitLocations, opponent, "battleship");
-        int destroyerCounter = Utils.countHits(this.hitLocations, opponent, "destroyer");
-        int submarineCounter = Utils.countHits(this.hitLocations, opponent, "submarine");
-        int patrolboatCounter = Utils.countHits(this.hitLocations, opponent, "patrolboat");
-
-        damages.put("carrierHits", carrierCounter);
-        damages.put("battleshipHits", battleshipCounter);
-        damages.put("destroyerHits", destroyerCounter);
-        damages.put("submarineHits", submarineCounter);
-        damages.put("patrolboatHits", patrolboatCounter);
-
-        damages.put("carrier", carrierCounter);
-        damages.put("battleship", battleshipCounter);
-        damages.put("destroyer", destroyerCounter);
-        damages.put("submarine", submarineCounter);
-        damages.put("patrolboat", patrolboatCounter);
-
-        this.missed = salvo.getSalvoLocations().size() - this.hitLocations.size();
+    public DamageReportDTO(int turn, List<String> hitLocations, Map<String, Integer> damages, int missed){
+        this.turn = turn;
+        this.hitLocations = hitLocations;
+        this.damages = damages;
+        this.missed = missed;
     }
 
     public int getTurn() {
@@ -60,5 +35,21 @@ public class DamageReportDTO {
 
     public int getMissed() {
         return missed;
+    }
+
+    public void setTurn(int turn) {
+        this.turn = turn;
+    }
+
+    public void setHitLocations(List<String> hitLocations) {
+        this.hitLocations = hitLocations;
+    }
+
+    public void setDamages(Map<String, Integer> damages) {
+        this.damages = damages;
+    }
+
+    public void setMissed(int missed) {
+        this.missed = missed;
     }
 }

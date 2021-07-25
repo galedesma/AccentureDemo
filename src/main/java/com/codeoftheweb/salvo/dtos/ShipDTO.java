@@ -1,7 +1,5 @@
 package com.codeoftheweb.salvo.dtos;
 
-import com.codeoftheweb.salvo.models.Ship;
-
 import java.util.List;
 
 public class ShipDTO {
@@ -10,9 +8,11 @@ public class ShipDTO {
 
     private List<String> locations;
 
-    public ShipDTO(Ship ship){
-        this.type = ship.getType();
-        this.locations = ship.getShipLocations();
+    public ShipDTO(){}
+
+    public ShipDTO(String type, List<String> locations){
+        this.type = type;
+        this.locations = locations;
     }
 
     public String getType() {
@@ -21,5 +21,13 @@ public class ShipDTO {
 
     public List<String> getLocations() {
         return locations;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    public void setLocations(List<String> locations) {
+        this.locations = locations;
     }
 }

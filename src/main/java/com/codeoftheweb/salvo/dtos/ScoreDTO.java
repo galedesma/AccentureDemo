@@ -15,15 +15,12 @@ public class ScoreDTO {
 
     private Date finishDate;
 
-    public ScoreDTO(GamePlayer gamePlayer){
-        Optional<Score> score = gamePlayer.getScore();
-        if(score.isEmpty()){
-            this.score = 0;
-        } else {
-            this.player = score.get().getPlayer().getId();
-            this.score = score.get().getScore();
-            this.finishDate = score.get().getFinishDate();
-        }
+    public ScoreDTO(){}
+
+    public ScoreDTO(double score, long player, Date finishDate){
+        this.score = score;
+        this.player = player;
+        this.finishDate = finishDate;
     }
 
     public double getScore() {
@@ -36,5 +33,17 @@ public class ScoreDTO {
 
     public Date getFinishDate() {
         return finishDate;
+    }
+
+    public void setScore(double score) {
+        this.score = score;
+    }
+
+    public void setPlayer(long player) {
+        this.player = player;
+    }
+
+    public void setFinishDate(Date finishDate) {
+        this.finishDate = finishDate;
     }
 }

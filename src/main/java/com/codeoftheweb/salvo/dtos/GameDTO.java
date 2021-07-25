@@ -1,10 +1,7 @@
 package com.codeoftheweb.salvo.dtos;
 
-import com.codeoftheweb.salvo.models.Game;
-
 import java.util.Date;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 public class GameDTO {
 
@@ -16,11 +13,15 @@ public class GameDTO {
 
     private Set<ScoreDTO> scores;
 
-    public GameDTO(Game game){
-        this.id = game.getGameId();
-        this.created = game.getGameDate();
-        this.gamePlayers = game.getGamePlayers().stream().map(gp -> new GamePlayerDTO(gp)).collect(Collectors.toSet());
-        this.scores = game.getGamePlayers().stream().map(gp -> new ScoreDTO(gp)).collect(Collectors.toSet());
+    public GameDTO(){
+
+    }
+
+    public GameDTO(long id, Date created, Set<GamePlayerDTO> gamePlayers, Set<ScoreDTO> scores){
+        this.id = id;
+        this.created = created;
+        this.gamePlayers = gamePlayers;
+        this.scores = scores;
     }
 
     public long getId() {
@@ -37,5 +38,21 @@ public class GameDTO {
 
     public Set<ScoreDTO> getScores() {
         return scores;
+    }
+
+    public void setId(long id) {
+        this.id = id;
+    }
+
+    public void setCreated(Date created) {
+        this.created = created;
+    }
+
+    public void setGamePlayers(Set<GamePlayerDTO> gamePlayers) {
+        this.gamePlayers = gamePlayers;
+    }
+
+    public void setScores(Set<ScoreDTO> scores) {
+        this.scores = scores;
     }
 }

@@ -8,6 +8,8 @@ public class PlayerDTO {
 
     private String email;
 
+    public PlayerDTO(){}
+
     public PlayerDTO(Player player){
         this.id = player.getId();
         this.email = player.getUserName();
@@ -19,5 +21,13 @@ public class PlayerDTO {
 
     public String getEmail() {
         return email;
+    }
+
+    public void setId(long id) {
+        this.id = id;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
     }
 }

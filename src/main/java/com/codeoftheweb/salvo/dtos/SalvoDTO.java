@@ -1,7 +1,5 @@
 package com.codeoftheweb.salvo.dtos;
 
-import com.codeoftheweb.salvo.models.Salvo;
-
 import java.util.List;
 
 public class SalvoDTO {
@@ -12,10 +10,12 @@ public class SalvoDTO {
 
     private List<String> locations;
 
-    public SalvoDTO(Salvo salvo){
-        this.turn = salvo.getTurn();
-        this.player = salvo.getGamePlayer().getPlayer().getId();
-        this.locations = salvo.getSalvoLocations();
+    public SalvoDTO(){}
+
+    public SalvoDTO(int turn, long player, List<String> locations){
+        this.turn = turn;
+        this.player = player;
+        this.locations = locations;
     }
 
     public int getTurn() {
@@ -28,5 +28,17 @@ public class SalvoDTO {
 
     public List<String> getLocations() {
         return locations;
+    }
+
+    public void setTurn(int turn) {
+        this.turn = turn;
+    }
+
+    public void setPlayer(long player) {
+        this.player = player;
+    }
+
+    public void setLocations(List<String> locations) {
+        this.locations = locations;
     }
 }

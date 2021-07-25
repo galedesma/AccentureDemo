@@ -1,30 +1,17 @@
 package com.codeoftheweb.salvo.dtos;
 
-import com.codeoftheweb.salvo.models.Game;
-import com.codeoftheweb.salvo.models.GamePlayer;
-import com.codeoftheweb.salvo.models.Salvo;
-import com.codeoftheweb.salvo.utils.Utils;
-
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 public class HitsDTO {
 
     private List<Object> self;
     private List<Object> opponent;
 
-    public HitsDTO(Game game, GamePlayer gamePlayer){
+    public HitsDTO(){}
 
-        Optional<GamePlayer> opp = game.getGamePlayers().stream().filter(gp -> gp != gamePlayer).findFirst();
-
-        if(opp.isEmpty()){
-            this.self = new ArrayList<>();
-            this.opponent = new ArrayList<>();
-        } else {
-            this.opponent = Utils.getReport(gamePlayer, opp.get());
-            this.self = Utils.getReport(opp.get(), gamePlayer);
-        }
+    public HitsDTO(List<Object> self, List<Object> opponent){
+        this.self = self;
+        this.opponent = opponent;
     }
 
     public List<Object> getSelf() {
@@ -33,5 +20,13 @@ public class HitsDTO {
 
     public List<Object> getOpponent() {
         return opponent;
+    }
+
+    public void setSelf(List<Object> self) {
+        this.self = self;
+    }
+
+    public void setOpponent(List<Object> opponent) {
+        this.opponent = opponent;
     }
 }
