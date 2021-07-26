@@ -55,27 +55,31 @@ public class GameViewController {
             return new ResponseEntity<>(Utils.getDefaultDTO("error", "This gamePlayer doesn't exist yet!"), HttpStatus.UNAUTHORIZED);
         }
 
-        Game game = this.gameRepository.getById(gamePlayer.get().getGame().getGameId());
+        Optional<Game> game = this.gameRepository.findById(gamePlayer.get().getGame().getGameId());
+
+        if(game.isEmpty()){
+            return new ResponseEntity<>(Utils.getDefaultDTO("error", "This game doesn't exist!"), HttpStatus.UNAUTHORIZED);
+        }
 
         if(!getCurrentLoggedUser(authentication).getGamePlayers().contains(gamePlayer.get())) {
             return new ResponseEntity<>(Utils.getDefaultDTO("error", "You are not allowed to view this game"), HttpStatus.UNAUTHORIZED);
         }
 
         ObjectMapper oMapper = new ObjectMapper();
-        GameViewDTO currentGameView = gameService.makeGameViewDTO(game, gamePlayer.get());
+        GameViewDTO currentGameView = gameService.makeGameViewDTO(game.get(), gamePlayer.get());
 
         if(currentGameView.getGameState() == GameState.WON){
-            Score winnerScore = new Score(1.0, game, gamePlayer.get().getPlayer());
+            Score winnerScore = new Score(1.0, game.get(), gamePlayer.get().getPlayer());
             scoreRepository.save(winnerScore);
         }
 
         if(currentGameView.getGameState() == GameState.LOST){
-            Score loserScore = new Score(0.0, game, gamePlayer.get().getPlayer());
+            Score loserScore = new Score(0.0, game.get(), gamePlayer.get().getPlayer());
             scoreRepository.save(loserScore);
         }
 
         if(currentGameView.getGameState() == GameState.TIE){
-            Score tieScore = new Score(0.5, game, gamePlayer.get().getPlayer());
+            Score tieScore = new Score(0.5, game.get(), gamePlayer.get().getPlayer());
             scoreRepository.save(tieScore);
         }
 
