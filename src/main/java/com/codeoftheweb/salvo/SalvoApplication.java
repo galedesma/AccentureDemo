@@ -1,5 +1,7 @@
 package com.codeoftheweb.salvo;
 
+import com.codeoftheweb.salvo.models.*;
+import com.codeoftheweb.salvo.repositories.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
@@ -54,25 +56,38 @@ public class SalvoApplication {
 			Player talmeida = new Player("t.almeida@ctu.gov", passwordEncoder().encode("kb"));
 			Player dpalmer = new Player("d.palmer@whitehouse.gov", passwordEncoder().encode("mole"));
 
-			Ship ship1 = new Ship("Patrol Boat", Arrays.asList("A1","A2"));
-			Ship ship2 = new Ship("Patrol Boat", Arrays.asList("B1", "C1"));
-			Ship ship3 = new Ship("Destroyer", Arrays.asList("J1", "J2", "J3"));
-			Ship ship4 = new Ship("Destroyer", Arrays.asList("H10", "I10", "J10"));
+			Ship ship1a = new Ship("destroyer", Arrays.asList("H2","H3","H4"));
+			Ship ship1b = new Ship("submarine", Arrays.asList("E1","F1","G1"));
+			Ship ship1c = new Ship("patrolboat", Arrays.asList("B4","B5"));
+			Ship ship1d = new Ship("carrier", Arrays.asList("E10", "F10", "G10", "H10", "I10"));
+			Ship ship1e = new Ship("battleship", Arrays.asList("A1", "B1", "C1", "D1"));
+			Ship ship2a = new Ship("destroyer", Arrays.asList("B5", "C5", "D5"));
+			Ship ship2b = new Ship("patrolboat", Arrays.asList("F1", "F2"));
+			Ship ship3a = new Ship("Destroyer", Arrays.asList("B5", "C5", "D5"));
+			Ship ship3b = new Ship("Patrol Boat", Arrays.asList("C6","C7"));
+			Ship ship4a = new Ship("Submarine", Arrays.asList("A2","A3","A4"));
+			Ship ship4b = new Ship("Patrol Boat", Arrays.asList("G6","H6"));
 			Ship ship5 = new Ship("Submarine", Arrays.asList("C1","C2","C3"));
 			Ship ship6 = new Ship("Submarine", Arrays.asList("D1", "E1", "F1"));
 			Ship ship7 = new Ship("Battleship", Arrays.asList("I2", "I3", "I4", "I5"));
 			Ship ship8 = new Ship("Carrier", Arrays.asList("G5", "G6", "G7", "G8","G9"));
 
-			Salvo salvo1 = new Salvo(Arrays.asList("B5", "C5", "F1", "A1"),1);
-			Salvo salvo2 = new Salvo(Arrays.asList("F2", "D5", "A1"),1);
-			Salvo salvo3 = new Salvo(Arrays.asList("A2", "A4", "G6"),1);
-			Salvo salvo4 = new Salvo(Arrays.asList("A3", "H6"),1);
+			Salvo salvo1a = new Salvo(Arrays.asList("B5", "C5", "F1"),1);
+			Salvo salvo1b = new Salvo(Arrays.asList("F2", "D5"),2);
+			Salvo salvo1c = new Salvo(Arrays.asList("G6", "G7","G8"), 3);
+			Salvo salvo2a = new Salvo(Arrays.asList("B4", "B5", "B6", "F1"),1);
+			Salvo salvo2b = new Salvo(Arrays.asList("E1", "H3", "A2", "H2"),2);
+			Salvo salvo2c = new Salvo(Arrays.asList("E8", "E9", "E10", "G10", "I10"),3);
+			Salvo salvo3a = new Salvo(Arrays.asList("A2", "A4", "G6"),1);
+			Salvo salvo3b = new Salvo(Arrays.asList("A3", "H6"),2);
+			Salvo salvo4a = new Salvo(Arrays.asList("B5", "D5", "C7"),1);
+			Salvo salvo4b = new Salvo(Arrays.asList("C5","C6"),2);
 			Salvo salvo5 = new Salvo(Arrays.asList("G6", "H6"),1);
 			Salvo salvo6 = new Salvo(Arrays.asList("A2", "A3", "D8"),1);
 			Salvo salvo7 = new Salvo(Arrays.asList("A3", "A4", "F7"),1);
 			Salvo salvo8 = new Salvo(Arrays.asList("A2", "G6", "H6"),1);
 			Salvo salvo9 = new Salvo(Arrays.asList("A1", "A2", "A3"),1);
-			Salvo salvo10 = new Salvo(Arrays.asList("G6", "G7","G8"), 2);
+
 
 			Score score1 = new Score(1.0, game1, jbauer);
 			Score score2 = new Score(0.0, game1, cobrian);
@@ -89,21 +104,29 @@ public class SalvoApplication {
 			GamePlayer gp1 = new GamePlayer();
 			gp1.setGame(game1);
 			gp1.setPlayer(jbauer);
-			gp1.addShip(ship1);
+			gp1.addShip(ship1a);
+			gp1.addShip(ship1b);
+			gp1.addShip(ship1c);
+			gp1.addShip(ship1d);
+			gp1.addShip(ship1e);
 
 			GamePlayer gp2 = new GamePlayer();
 			gp2.setGame(game1);
 			gp2.setPlayer(cobrian);
-			gp2.addShip(ship2);
+			gp2.addShip(ship2a);
+			gp2.addShip(ship2b);
 
 			GamePlayer gp3 = new GamePlayer();
 			gp3.setGame(game2);
 			gp3.setPlayer(jbauer);
-			gp3.addShip(ship3);
+			gp3.addShip(ship3a);
+			gp3.addShip(ship3b);
 
 			GamePlayer gp4 = new GamePlayer();
 			gp4.setGame(game2);
 			gp4.setPlayer(cobrian);
+			gp4.addShip(ship4a);
+			gp4.addShip(ship4b);
 
 			GamePlayer gp5 = new GamePlayer();
 			gp5.setGame(game3);
@@ -112,7 +135,6 @@ public class SalvoApplication {
 			GamePlayer gp6 = new GamePlayer();
 			gp6.setGame(game3);
 			gp6.setPlayer(talmeida);
-			gp6.addShip(ship4);
 
 			GamePlayer gp7 = new GamePlayer();
 			gp7.setGame(game4);
@@ -138,16 +160,22 @@ public class SalvoApplication {
 			gp11.setGame(game6);
 			gp11.setPlayer(dpalmer);
 
-			gp1.addSalvo(salvo1);
-			gp2.addSalvo(salvo2);
-			gp3.addSalvo(salvo3);
-			gp4.addSalvo(salvo4);
+			gp1.addSalvo(salvo1a);
+			gp1.addSalvo(salvo1b);
+			gp1.addSalvo(salvo1c);
+			gp2.addSalvo(salvo2a);
+			gp2.addSalvo(salvo2b);
+			gp2.addSalvo(salvo2c);
+			gp3.addSalvo(salvo3a);
+			gp3.addSalvo(salvo3b);
+			gp4.addSalvo(salvo4a);
+			gp4.addSalvo(salvo4b);
 			gp5.addSalvo(salvo5);
 			gp6.addSalvo(salvo6);
 			gp7.addSalvo(salvo7);
 			gp8.addSalvo(salvo8);
 			gp9.addSalvo(salvo9);
-			gp1.addSalvo(salvo10);
+
 
 			gameRepo.save(game1);
 			gameRepo.save(game2);
@@ -155,6 +183,7 @@ public class SalvoApplication {
 			gameRepo.save(game4);
 			gameRepo.save(game5);
 			gameRepo.save(game6);
+
 			playerRepo.save(jbauer);
 			playerRepo.save(cobrian);
 			playerRepo.save(talmeida);
@@ -172,25 +201,36 @@ public class SalvoApplication {
 			gpRepo.save(gp10);
 			gpRepo.save(gp11);
 
-			shipRepo.save(ship1);
-			shipRepo.save(ship2);
-			shipRepo.save(ship3);
-			shipRepo.save(ship4);
+			shipRepo.save(ship1a);
+			shipRepo.save(ship1b);
+			shipRepo.save(ship1c);
+			shipRepo.save(ship1d);
+			shipRepo.save(ship1e);
+			shipRepo.save(ship2a);
+			shipRepo.save(ship2b);
+			shipRepo.save(ship3a);
+			shipRepo.save(ship4a);
+			shipRepo.save(ship4b);
 			shipRepo.save(ship5);
 			shipRepo.save(ship6);
 			shipRepo.save(ship7);
 			shipRepo.save(ship8);
 
-			salvoRepo.save(salvo1);
-			salvoRepo.save(salvo2);
-			salvoRepo.save(salvo3);
-			salvoRepo.save(salvo4);
+			salvoRepo.save(salvo1a);
+			salvoRepo.save(salvo1b);
+			salvoRepo.save(salvo1c);
+			salvoRepo.save(salvo2a);
+			salvoRepo.save(salvo2b);
+			salvoRepo.save(salvo2c);
+			salvoRepo.save(salvo3a);
+			salvoRepo.save(salvo3b);
+			salvoRepo.save(salvo4a);
+			salvoRepo.save(salvo4b);
 			salvoRepo.save(salvo5);
 			salvoRepo.save(salvo6);
 			salvoRepo.save(salvo7);
 			salvoRepo.save(salvo8);
 			salvoRepo.save(salvo9);
-			salvoRepo.save(salvo10);
 
 			scoreRepo.save(score1);
 			scoreRepo.save(score2);

@@ -1,4 +1,4 @@
-package com.codeoftheweb.salvo;
+package com.codeoftheweb.salvo.models;
 
 import org.hibernate.annotations.GenericGenerator;
 
@@ -19,8 +19,8 @@ public class Ship {
     private GamePlayer gamePlayer;
 
     @ElementCollection
-    @Column(name="locations")
-    private List<String> locations = new ArrayList<>();
+    @Column(name="shipLocations")
+    private List<String> shipLocations = new ArrayList<>();
 
     private String type;
 
@@ -29,17 +29,17 @@ public class Ship {
 
     }
 
-    public Ship(String type, List<String> locations){
+    public Ship(String type, List<String> shipLocations){
         this.type = type;
-        this.locations = locations;
+        this.shipLocations = shipLocations;
     }
 
     public String getType() {
         return type;
     }
 
-    public List<String> getLocations() {
-        return locations;
+    public List<String> getShipLocations() {
+        return shipLocations;
     }
 
     public GamePlayer getGamePlayer() {
@@ -48,5 +48,9 @@ public class Ship {
 
     public void setGamePlayer(GamePlayer gamePlayer){
         this.gamePlayer = gamePlayer;
+    }
+
+    public void setShipLocations(List<String> shipLocations) {
+        this.shipLocations = shipLocations;
     }
 }

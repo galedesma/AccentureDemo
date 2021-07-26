@@ -1,4 +1,4 @@
-package com.codeoftheweb.salvo;
+package com.codeoftheweb.salvo.models;
 
 import org.hibernate.annotations.GenericGenerator;
 
@@ -58,8 +58,11 @@ public class Player {
     }
 
     public void addScore(Score score){
-        //score.setPlayer(this);
         scores.add(score);
+    }
+
+    public Set<GamePlayer> getGamePlayers() {
+        return gamePlayers;
     }
 
     public Set<Score> getScores(){

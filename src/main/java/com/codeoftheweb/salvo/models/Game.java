@@ -1,4 +1,4 @@
-package com.codeoftheweb.salvo;
+package com.codeoftheweb.salvo.models;
 
 import org.hibernate.annotations.GenericGenerator;
 import javax.persistence.*;
@@ -61,7 +61,6 @@ public class Game {
     }
 
     public void addScore(Score score){
-        //score.setGame(this);
         scores.add(score);
     }
 }
