@@ -1,11 +1,6 @@
 package com.codeoftheweb.salvo.dtos;
 
-import com.codeoftheweb.salvo.models.GamePlayer;
-import com.codeoftheweb.salvo.models.Player;
-import com.codeoftheweb.salvo.models.Score;
-
 import java.util.Date;
-import java.util.Optional;
 
 public class ScoreDTO {
 

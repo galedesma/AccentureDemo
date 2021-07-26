@@ -1,6 +1,8 @@
 package com.codeoftheweb.salvo.utils;
 
 import com.codeoftheweb.salvo.models.Salvo;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
+import org.springframework.security.core.Authentication;
 
 import java.util.*;
 
@@ -22,5 +24,9 @@ public class Utils {
             }
         }
         return aux;
+    }
+
+    public static boolean isGuest(Authentication authentication){
+        return authentication == null || authentication instanceof AnonymousAuthenticationToken;
     }
 }

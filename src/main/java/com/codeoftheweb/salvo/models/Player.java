@@ -58,7 +58,6 @@ public class Player {
     }
 
     public void addScore(Score score){
-        //score.setPlayer(this);
         scores.add(score);
     }
 
